@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CaseController : MonoBehaviour
 {
-    public int i,j;
+    public Vector2 pos;
     public List<GameObject> arrGO_neighbour;
     public float poids;
 
@@ -30,8 +30,8 @@ public class CaseController : MonoBehaviour
 
     public void setPos(int _i, int _j)
     {
-        i = _i;
-        j = _j;
+        pos.x = _i;
+        pos.y = _j;
     }
 
     public void setPoids(float f)
