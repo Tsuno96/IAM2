@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CaseController : MonoBehaviour
 {
-    public Vector2 pos;
+    private Vector2Int pos;
     public List<GameObject> arrGO_neighbour;
     public float poids;
 
@@ -28,6 +28,11 @@ public class CaseController : MonoBehaviour
         
     }
 
+    public Vector2Int GetPos()
+    {
+        return pos;
+    }
+
     public void setPos(int _i, int _j)
     {
         pos.x = _i;
@@ -41,7 +46,7 @@ public class CaseController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!arrGO_neighbour.Contains(other.gameObject))
+        if (!arrGO_neighbour.Contains(other.gameObject) && other.tag == "Case" /*&& other.gameObject.GetComponent<CaseController>().poids <Mathf.Infinity*/)
         {
             arrGO_neighbour.Add(other.gameObject);
         }

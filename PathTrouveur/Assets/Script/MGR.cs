@@ -7,17 +7,21 @@ public class MGR : MonoBehaviour
     private static MGR p_instance = null;
     public static MGR Instance { get { return p_instance; } }
 
+    public Material mat;
     public Material mat_Obstacle;
 
     public GameObject GO_Plane;
     public GameObject GO_Case;
 
+    public GameObject GO_Player;
+
     public GameObject[,] arrGO_Cases;
 
     int[,] layout;
+    float[,] matInf;
+    public Vector2Int vec2_Depart;
+    public Vector2Int vec2_Arrive;
 
-    public Vector2 vec2_Depart;
-    public Vector2 vec2_Arrive;
 
 
 
@@ -42,7 +46,7 @@ public class MGR : MonoBehaviour
         {1  ,0  ,1  ,1  ,1  ,1 ,1 ,1 ,1 ,1 },
         {1  ,1  ,1  ,1  ,1  ,1 ,1 ,1 ,1 ,1 },
         {1  ,1  ,1  ,1  ,0  ,1 ,1 ,1 ,1 ,1 },
-        {1  ,1  ,1  ,1  ,1  ,1 ,1 ,1 ,1 ,1 },
+        {1  ,1  ,1  ,1  ,0  ,1 ,1 ,1 ,1 ,1 },
         {1  ,1  ,1  ,1  ,1  ,1 ,1 ,1 ,1 ,1 },
         {1  ,1  ,1  ,1  ,1  ,1 ,1 ,1 ,1 ,1 },
         {1  ,1  ,1  ,1  ,1  ,1 ,1 ,1 ,1 ,1 },
@@ -67,6 +71,20 @@ public class MGR : MonoBehaviour
                     arrGO_Cases[i, j].GetComponent<CaseController>().setPoids(Mathf.Infinity);
                 }
             }
+        Instantiate(GO_Player.transform, new Vector3(9.5f, 0.5f, 9.5f), Quaternion.identity);
+        
+    }
+
+    void Start()
+    {
+        matInf = new float[10, 10];
+        for (int i = 0; i < 10; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                matInf[i, j] = Mathf.Infinity;
+            }
+        }
     }
 
     // Update is called once per frame
@@ -75,9 +93,91 @@ public class MGR : MonoBehaviour
         
     }
 
-    void Dijkstra()
+    private void OnGUI()
     {
+        Event e = Event.current;
+        if(e.button == 0 && e.isMouse)
+        {
+            if (arrGO_Cases[vec2_Arrive.x, vec2_Arrive.y].GetComponent<CaseController>().poids < Mathf.Infinity)
+            {
+                Dijkstra();
+            }
+        }
 
+    }
+
+    public void Dijkstra()
+    {
+        
+        List<Vector2Int> P = new List<Vector2Int>();
+        /*Initialisation*/
+        float[,] dst = matInf;
+        dst[vec2_Depart.x, vec2_Depart.y] = 0;
+
+
+        List<GameObject> Q = new List<GameObject>();
+        for (int i = 0; i < 10; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                if (arrGO_Cases[i, j].GetComponent<CaseController>().poids < Mathf.Infinity)
+                {
+                    arrGO_Cases[i, j].GetComponent<Renderer>().material = mat;
+                }
+            }
+        }
+
+        Vector2Int[,] predecesseurs = new Vector2Int[10, 10];
+        while(P.Count != 10*10) { 
+            float mindst = Mathf.Infinity;
+            Vector2Int minCase = new Vector2Int(vec2_Depart.x, vec2_Depart.y);
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    if (dst[i, j] != Mathf.Infinity)
+                    {
+                        Debug.Log("dst[" + i + "," + j + "] : " + dst[i, j]);
+                    }
+                    if(!P.Contains(new Vector2Int(i,j)) && mindst> dst[i,j])
+                    {
+                        mindst = dst[i, j];
+                        minCase = new Vector2Int(i, j);
+                    }
+                }
+            }
+            Debug.Log("MinCase : " + minCase + " dst : " + mindst);
+            P.Add(arrGO_Cases[minCase.x, minCase.y].GetComponent<CaseController>().GetPos());
+            
+
+            List<GameObject> CSnghb = arrGO_Cases[minCase.x,minCase.y].GetComponent<CaseController>().arrGO_neighbour;
+            foreach (GameObject GO in CSnghb)
+            {
+                Vector2Int posGO = GO.GetComponent<CaseController>().GetPos();
+
+                if(dst[posGO.x, posGO.y] > (dst[minCase.x, minCase.y] + arrGO_Cases[posGO.x, posGO.y].GetComponent<CaseController>().poids))
+                {
+                    dst[posGO.x, posGO.y] = dst[minCase.x, minCase.y] + arrGO_Cases[posGO.x, posGO.y].GetComponent<CaseController>().poids;
+                    predecesseurs[posGO.x, posGO.y] = new Vector2Int(minCase.x, minCase.y);
+                }
+            }
+
+
+        }
+
+        List<Vector2Int> chemin = new List<Vector2Int>();
+        Vector2Int s = vec2_Arrive;
+        while (s != vec2_Depart)
+        {
+            chemin.Add(s);
+            arrGO_Cases[s.x, s.y].GetComponent<Renderer>().material = mat_Obstacle;
+            arrGO_Cases[s.x, s.y].GetComponent<Renderer>().material.color = Color.blue;
+            s = predecesseurs[s.x, s.y];
+        }
+        arrGO_Cases[vec2_Arrive.x, vec2_Arrive.y].GetComponent<Renderer>().material = mat_Obstacle;
+        arrGO_Cases[vec2_Arrive.x, vec2_Arrive.y].GetComponent<Renderer>().material.color = Color.cyan;
+        arrGO_Cases[vec2_Depart.x, vec2_Depart.y].GetComponent<Renderer>().material = mat_Obstacle;
+        arrGO_Cases[vec2_Depart.x, vec2_Depart.y].GetComponent<Renderer>().material.color = Color.green;
 
 
     }

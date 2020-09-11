@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="Assets\Script\MGR.cs" />
     <Compile Include="Assets\Script\CaseController.cs" />
+    <Compile Include="Assets\Script\PlayerController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
