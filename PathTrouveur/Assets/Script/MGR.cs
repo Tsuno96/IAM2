@@ -14,6 +14,7 @@ public class MGR : MonoBehaviour
     public GameObject GO_Case;
 
     public GameObject GO_Player;
+    public GameObject GO_Bot;
 
     public GameObject[,] arrGO_Cases;
 
@@ -21,6 +22,12 @@ public class MGR : MonoBehaviour
     float[,] matInf;
     public Vector2Int vec2_Depart;
     public Vector2Int vec2_Arrive;
+
+    public int n_PlayerSpeed;
+    public int n_BotSpeed;
+
+    public Vector3 vec3_BotDst;
+    public bool letsgo;
 
 
 
@@ -71,20 +78,16 @@ public class MGR : MonoBehaviour
                     arrGO_Cases[i, j].GetComponent<CaseController>().setPoids(Mathf.Infinity);
                 }
             }
+
         Instantiate(GO_Player.transform, new Vector3(9.5f, 0.5f, 9.5f), Quaternion.identity);
+
+        Instantiate(GO_Bot.transform, new Vector3(vec2_Depart.x + .5f, 0.5f, vec2_Depart.y + .5f), Quaternion.identity);
         
     }
 
     void Start()
     {
-        matInf = new float[10, 10];
-        for (int i = 0; i < 10; i++)
-        {
-            for (int j = 0; j < 10; j++)
-            {
-                matInf[i, j] = Mathf.Infinity;
-            }
-        }
+        
     }
 
     // Update is called once per frame
@@ -103,15 +106,28 @@ public class MGR : MonoBehaviour
                 Dijkstra();
             }
         }
+        if(e.isKey)
+        {
+            Dijkstra();
+        }
 
     }
 
     public void Dijkstra()
     {
-        
+
         List<Vector2Int> P = new List<Vector2Int>();
         /*Initialisation*/
-        float[,] dst = matInf;
+        float[,] dst = new float[10,10];
+        for (int i = 0; i < 10; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                dst[i, j] = Mathf.Infinity;
+            }
+        }
+
+
         dst[vec2_Depart.x, vec2_Depart.y] = 0;
 
 
@@ -137,7 +153,7 @@ public class MGR : MonoBehaviour
                 {
                     if (dst[i, j] != Mathf.Infinity)
                     {
-                        Debug.Log("dst[" + i + "," + j + "] : " + dst[i, j]);
+                        //Debug.Log("dst[" + i + "," + j + "] : " + dst[i, j]);
                     }
                     if(!P.Contains(new Vector2Int(i,j)) && mindst> dst[i,j])
                     {
@@ -146,7 +162,7 @@ public class MGR : MonoBehaviour
                     }
                 }
             }
-            Debug.Log("MinCase : " + minCase + " dst : " + mindst);
+            //Debug.Log("MinCase : " + minCase + " dst : " + mindst);
             P.Add(arrGO_Cases[minCase.x, minCase.y].GetComponent<CaseController>().GetPos());
             
 
@@ -179,9 +195,9 @@ public class MGR : MonoBehaviour
         arrGO_Cases[vec2_Depart.x, vec2_Depart.y].GetComponent<Renderer>().material = mat_Obstacle;
         arrGO_Cases[vec2_Depart.x, vec2_Depart.y].GetComponent<Renderer>().material.color = Color.green;
 
+        vec3_BotDst = new Vector3(chemin[chemin.Count -1].x +.5f,0.5f, chemin[chemin.Count - 1].y+0.5f);
+        letsgo = true;
 
     }
-
-
 
 }

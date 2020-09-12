@@ -19,6 +19,7 @@ public class CaseController : MonoBehaviour
         if(poids >1)
         {
             this.gameObject.GetComponent<Renderer>().material = MGR.Instance.mat_Obstacle;
+            BoxCollider bc = gameObject.AddComponent<BoxCollider>() as BoxCollider;
         }
     }
 
