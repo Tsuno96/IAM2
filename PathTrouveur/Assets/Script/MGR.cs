@@ -36,7 +36,7 @@ public class MGR : MonoBehaviour
 
     int Counter;
 
-
+    public bool DijkstraOffAstarOn;
 
 
 
@@ -117,12 +117,27 @@ public class MGR : MonoBehaviour
         {
             if (arrGO_Cases[vec2_Arrive.x, vec2_Arrive.y].GetComponent<CaseController>().poids < Mathf.Infinity)
             {
-                Astar();
+                if(DijkstraOffAstarOn)
+                {
+                    Astar();
+                }
+                else
+                {
+                    Dijkstra();
+                }
+                
             }
         }
         if (e.isKey)
         {
-            Astar();
+            if (DijkstraOffAstarOn)
+            {
+                Astar();
+            }
+            else
+            {
+                Dijkstra();
+            }
         }
 
     }

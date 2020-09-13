@@ -27,7 +27,16 @@ public class BotController : MonoBehaviour
         {
             pos = new Vector2Int((int)(transform.position.x), (int)(transform.position.z));
             MGR.Instance.vec2_Depart = pos;
-            MGR.Instance.Astar();
+
+            if (MGR.Instance.DijkstraOffAstarOn)
+            {
+                MGR.Instance.Astar();
+            }
+            else
+            {
+                MGR.Instance.Dijkstra();
+            }
+         
         }
             
     }
