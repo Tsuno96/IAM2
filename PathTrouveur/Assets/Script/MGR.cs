@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MGR : MonoBehaviour
 {
@@ -17,6 +18,10 @@ public class MGR : MonoBehaviour
     public GameObject GO_Player;
     public GameObject GO_Bot;
     Transform Bot;
+
+    public GameObject GO_Coin;
+    public List<GameObject> lstGO_Coins;
+
     public GameObject[,] arrGO_Cases;
 
     int[,] layout;
@@ -28,6 +33,8 @@ public class MGR : MonoBehaviour
     public int n_BotSpeed;
 
     public Vector3 vec3_BotDst;
+
+    int Counter;
 
 
 
@@ -48,19 +55,19 @@ public class MGR : MonoBehaviour
         arrGO_Cases = new GameObject[10, 10];
         layout = new int[10, 10]
         {
-        {1  ,0  ,1  ,1  ,1  ,1 ,1 ,1 ,1 ,1 },
-        {1  ,0  ,1  ,1  ,1  ,1 ,1 ,1 ,1 ,1 },
-        {1  ,0  ,1  ,1  ,1  ,1 ,1 ,1 ,1 ,1 },
-        {1  ,1  ,1  ,1  ,1  ,1 ,1 ,1 ,1 ,1 },
-        {1  ,1  ,1  ,1  ,0  ,1 ,1 ,1 ,1 ,1 },
-        {1  ,1  ,1  ,1  ,0  ,1 ,1 ,1 ,1 ,1 },
-        {1  ,1  ,1  ,1  ,1  ,1 ,1 ,1 ,1 ,1 },
-        {1  ,1  ,1  ,1  ,1  ,1 ,1 ,1 ,1 ,1 },
-        {1  ,1  ,1  ,1  ,1  ,1 ,1 ,1 ,1 ,1 },
-        {1  ,1  ,1  ,1  ,1  ,1 ,1 ,1 ,1 ,1 }
+        {0  ,0  ,0  ,0  ,0  ,0 ,0 ,0 ,0 ,0 },
+        {0  ,2  ,1  ,1  ,1  ,1 ,1 ,2 ,1 ,0 },
+        {0  ,0  ,1  ,1  ,1  ,1 ,1 ,0 ,1 ,0 },
+        {0  ,1  ,0  ,1  ,2  ,1 ,1 ,1 ,1 ,0 },
+        {0  ,1  ,1  ,1  ,0  ,0 ,1 ,2 ,1 ,0 },
+        {0  ,1  ,1  ,1  ,0  ,0 ,1 ,1 ,1 ,0 },
+        {0  ,1  ,2  ,1  ,1  ,1 ,1 ,1 ,1 ,0 },
+        {0  ,1  ,1  ,1  ,1  ,0 ,1 ,0 ,1 ,0 },
+        {0  ,1  ,1  ,1  ,1  ,0 ,2 ,0 ,1 ,0 },
+        {0  ,0  ,0  ,0  ,0  ,0 ,0 ,0 ,0 ,0 }
         };
 
-
+        lstGO_Coins = new List<GameObject>();
 
         Instantiate(GO_Plane.transform, new Vector3(5, 0, 5), Quaternion.identity);
         for (int i = 0; i < 10; i++)
@@ -73,6 +80,11 @@ public class MGR : MonoBehaviour
                 {
                     arrGO_Cases[i, j].GetComponent<CaseController>().setPoids(1.0f);
                 }
+                else if(layout[i,j] == 2)
+                {
+                    arrGO_Cases[i, j].GetComponent<CaseController>().setPoids(1.0f);
+                    lstGO_Coins.Add(Instantiate(GO_Coin, new Vector3(i + 0.5f, 0.5f, j + 0.5f), Quaternion.identity));
+                }
                 else
                 {
                     arrGO_Cases[i, j].GetComponent<CaseController>().setPoids(Mathf.Infinity);
@@ -82,6 +94,8 @@ public class MGR : MonoBehaviour
         Instantiate(GO_Player.transform, new Vector3(vec2_Arrive.x+.5f, 0.5f, vec2_Arrive.y+.5f), Quaternion.identity);
 
         Bot = Instantiate(GO_Bot.transform, new Vector3(vec2_Depart.x + .5f, 0.5f, vec2_Depart.y + .5f), Quaternion.identity);
+
+        Counter = lstGO_Coins.Count;
 
     }
 
@@ -232,7 +246,7 @@ public class MGR : MonoBehaviour
         int h = 10000;
         while (ouverte.Count > 0 && stop == false && h>0)
         {
-            Debug.Log("A*");
+            //Debug.Log("A*");
             h--;
             Vector2Int X = vec2_Depart;
             float min = Mathf.Infinity;
@@ -251,7 +265,7 @@ public class MGR : MonoBehaviour
             
             if (X == vec2_Arrive)
             {
-                Debug.Log("Arrivé");
+                //Debug.Log("Arrivé");
                 stop = true;
 
             }
@@ -304,7 +318,33 @@ public class MGR : MonoBehaviour
             }
         }
 
+    }
 
+    public void GettedCoin()
+    {
+        Counter--;
+        if(Counter <1)
+        {
+            EndGame(1);
+        }
+
+
+    }
+
+    public void EndGame(int i)
+    {
+        if(i == 0)
+        {
+            Debug.Log("Perdu");
+            SceneManager.LoadScene("LoseScene");
+        }
+        else
+        {
+            Debug.Log("Gagné");
+            SceneManager.LoadScene("Win");
+        }
+
+        //Application.Quit();
     }
 
 

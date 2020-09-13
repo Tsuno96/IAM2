@@ -32,8 +32,16 @@ public class BotController : MonoBehaviour
             
     }
 
+    void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.tag == "Player")
+        {
+            MGR.Instance.EndGame(0);
+        }
+    }
 
-   
+
+
 
 
 }
