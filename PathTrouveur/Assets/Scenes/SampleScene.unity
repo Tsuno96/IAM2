@@ -438,9 +438,8 @@ MonoBehaviour:
   GO_Case: {fileID: 692458381024647609, guid: 97d32d64eacc1cd4dbfbd6fed8879938, type: 3}
   GO_Player: {fileID: 6169190716085253093, guid: e7e05cd23efc9084088bda26c021db62, type: 3}
   GO_Bot: {fileID: 6169190716085253093, guid: f5e35f276c1edc44791cccdd2017071c, type: 3}
-  vec2_Depart: {x: 0, y: 0}
-  vec2_Arrive: {x: 0, y: 0}
+  vec2_Depart: {x: 5, y: 0}
+  vec2_Arrive: {x: 5, y: 6}
   n_PlayerSpeed: 5
-  n_BotSpeed: 1
+  n_BotSpeed: 3
   vec3_BotDst: {x: 0, y: 0, z: 0}
-  letsgo: 0

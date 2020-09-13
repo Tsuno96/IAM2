@@ -55,10 +55,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Script\BotController.cs" />
      <Compile Include="Assets\Script\MGR.cs" />
      <Compile Include="Assets\Script\PlayerController.cs" />
      <Compile Include="Assets\Script\CaseController.cs" />
-     <Compile Include="Assets\Script\BotController.cs" />
  <Reference Include="Unity.Timeline.Editor">
  <HintPath>D:/LYON 2/M2/IAM2/PathTrouveur/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
  </Reference>

@@ -47,7 +47,7 @@ public class CaseController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!arrGO_neighbour.Contains(other.gameObject) && other.tag == "Case" /*&& other.gameObject.GetComponent<CaseController>().poids <Mathf.Infinity*/)
+        if (!arrGO_neighbour.Contains(other.gameObject) && other.tag == "Case" && other.gameObject.GetComponent<CaseController>().poids <Mathf.Infinity)
         {
             arrGO_neighbour.Add(other.gameObject);
         }

@@ -17,7 +17,6 @@ public class BotController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        letsgo = MGR.Instance.letsgo;
         float step = MGR.Instance.n_BotSpeed * Time.deltaTime; // calculate distance to move
         if (letsgo)
         {
@@ -28,13 +27,10 @@ public class BotController : MonoBehaviour
         {
             pos = new Vector2Int((int)(transform.position.x), (int)(transform.position.z));
             MGR.Instance.vec2_Depart = pos;
-            MGR.Instance.Dijkstra();
+            MGR.Instance.Astar();
         }
             
     }
-
-
- 
 
 
    
