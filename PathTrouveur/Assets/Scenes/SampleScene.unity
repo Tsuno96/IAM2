@@ -415,4 +415,4 @@ MonoBehaviour:
   n_PlayerSpeed: 5
   n_BotSpeed: 3
   vec3_BotDst: {x: 0, y: 0, z: 0}
-  DijkstraOffAstarOn: 1
+  DijkstraOffAstarOn: 0
