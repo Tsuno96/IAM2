@@ -56,8 +56,6 @@ public class Flock : MonoBehaviour
         {
             List<Transform> context = GetNearbyObjects(b);
             //b.GetComponentInChildren<Renderer>().material.color = Color.Lerp(Color.white, Color.blue, context.Count / 6f);
-
-
             
             Vector2 move = behavior.CalculateMove(b, context, this);
             move *= driveFactor;
