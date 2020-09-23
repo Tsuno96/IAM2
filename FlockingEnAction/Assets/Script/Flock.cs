@@ -42,6 +42,7 @@ public class Flock : MonoBehaviour
             Vector3 pos = Random.insideUnitSphere * nbBoids * AgentDensity;
             Boid b = Instantiate(boid, new Vector3(pos.x,pos.y,0), Quaternion.Euler(Vector3.forward * Random.Range(0, 360f)),transform);
             b.name = "Boid" + i;
+            b.Initialize(this);
             lst_Boids.Add(b);
         }
         
@@ -54,7 +55,7 @@ public class Flock : MonoBehaviour
         foreach(Boid b in lst_Boids)
         {
             List<Transform> context = GetNearbyObjects(b);
-            b.GetComponentInChildren<Renderer>().material.color = Color.Lerp(Color.white, Color.blue, context.Count / 6f);
+            //b.GetComponentInChildren<Renderer>().material.color = Color.Lerp(Color.white, Color.blue, context.Count / 6f);
 
 
             

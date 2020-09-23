@@ -55,12 +55,19 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio Tools for Unity\16.0\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Script\BehaviorScript\FlockBehavior.cs" />
     <Compile Include="Assets\Script\Boid.cs" />
     <Compile Include="Assets\Script\Flock.cs" />
-    <Compile Include="Assets\Script\FlockBehavior.cs" />
-    <Compile Include="Assets\Script\CohesionBehavior.cs" />
-    <Compile Include="Assets\Script\AlignementBehavior.cs" />
-    <Compile Include="Assets\Script\AvoidanceBehavior.cs" />
+    <Compile Include="Assets\Script\BehaviorScript\CompositeBehavior.cs" />
+    <Compile Include="Assets\Script\BehaviorScript\StayInRadiusBehavior.cs" />
+    <Compile Include="Assets\Script\PhysicsLayerFilter.cs" />
+    <Compile Include="Assets\Script\ContextFilter.cs" />
+    <Compile Include="Assets\Script\SameFlockFilter.cs" />
+    <Compile Include="Assets\Script\BehaviorScript\SteeredCohesionBehavior.cs" />
+    <Compile Include="Assets\Script\BehaviorScript\AvoidanceBehavior.cs" />
+    <Compile Include="Assets\Script\BehaviorScript\AlignementBehavior.cs" />
+    <Compile Include="Assets\Script\BehaviorScript\FilteredFlockBehavior.cs" />
+    <Compile Include="Assets\Script\BehaviorScript\CohesionBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

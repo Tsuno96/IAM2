@@ -2,10 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+[RequireComponent(typeof(Collider2D))]
 public class Boid : MonoBehaviour
 {
-   // public Vector3 vec3_Pos;
-   // public Vector3 vec3_Velocity;
+
+    public Flock agentFlock;
+
+
+
     public Collider2D col_BoidCollider;
     // Start is called before the first frame update
     void Start()
@@ -13,10 +18,9 @@ public class Boid : MonoBehaviour
         col_BoidCollider = GetComponent<Collider2D>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Initialize(Flock f)
     {
-        
+        agentFlock = f;
     }
 
     public void Move(Vector2 velocity)
