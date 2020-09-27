@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2918574908934172848}
   m_Layer: 0
   m_Name: Agent
-  m_TagString: Untagged
+  m_TagString: Boid
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -115,3 +115,4 @@ MonoBehaviour:
   speed: 1
   neighborRadius: 5
   nghbs: []
+  velocity: {x: 0, y: 0}
