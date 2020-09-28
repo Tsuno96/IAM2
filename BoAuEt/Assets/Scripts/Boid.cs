@@ -12,13 +12,18 @@ public class Boid : MonoBehaviour
 
     public Vector2 velocity;
 
-    float maxVelocity = 5;
+    public float coefCohe = 1;
+    public float coefAl = 1;
+
+    public float coefEl = 1;
+
+    float maxVelocity = 10;
 
     // Start is called before the first frame update
     void Start()
     {
         nghbs = new List<Transform>();
-        velocity = new Vector2(Random.Range(1,10), Random.Range(1, 10)).normalized;
+        velocity = new Vector2(Random.Range(1,10), Random.Range(1, 10));
     }
 
     public void Initialise(float speed)
@@ -95,7 +100,7 @@ public class Boid : MonoBehaviour
             }
             avg /= boidsNeighbors.Count;
             avg /= 100;
-            velocity -= avg;
+            velocity -= avg *coefCohe;
 
         }
     }
@@ -115,7 +120,7 @@ public class Boid : MonoBehaviour
             }
             avg /= boidsNeighbors.Count;
             avg /= 40;
-            velocity += avg;
+            velocity += avg * coefAl;
 
         }
 
@@ -144,17 +149,16 @@ public class Boid : MonoBehaviour
                     if (b.gameObject.tag == "Obstacle")
                     {
                         Debug.Log(b);
-                        scale = 100;
+                        scale = 10;
                     }
-                    distance += diff * scale;
+                    distance += diff * scale *coefEl;
                 }
             }
 
-            if(numClose > 0)
-            {
-                distance /= numClose;
-                velocity -= distance;
-            }
+            
+            distance /= 5;
+            velocity -= distance;
+            
 
         }
     }
@@ -168,7 +172,8 @@ public class Boid : MonoBehaviour
             velocity *= scaleFactor;
         }
             
-        transform.position -= ((Vector3)velocity  * Time.deltaTime);
+        transform.position -= ((Vector3)velocity  *speed* Time.deltaTime);
+        transform.up = (Vector3)velocity;
         /*Vector3 newDirection = Vector3.RotateTowards(transform.forward, (Vector3)velocity, 0.0f, 0.0f);
         transform.rotation = Quaternion.LookRotation(newDirection);*/
 

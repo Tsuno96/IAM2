@@ -10,6 +10,12 @@ public class Spawner : MonoBehaviour
 
     [Range(10, 500)]
     public int nbBoids = 100;
+    [Range(0, 20)]
+    public float cohesion = 1;
+    [Range(0, 20)]
+    public float alignement = 1;
+    [Range(0, 20)]
+    public float eloignement = 1;
 
     // Start is called before the first frame update
     void Start()
@@ -30,6 +36,11 @@ public class Spawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+       foreach(Boid b in lst_Boids)
+       {
+           b.coefCohe = cohesion;
+           b.coefEl = eloignement;
+           b.coefAl = alignement;
+       } 
     }
 }
