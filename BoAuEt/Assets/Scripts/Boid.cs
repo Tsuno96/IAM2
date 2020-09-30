@@ -7,10 +7,12 @@ using UnityEngine;
 public class Boid : MonoBehaviour
 {
     public float speed = 1;
-    public float neighborRadius = 10;
+    public float neighborRadius;
     public List<Transform> nghbs;
 
     public Vector2 velocity;
+    
+    Spawner spawner;
 
     public float coefCohe = 1;
     public float coefAl = 1;
@@ -22,23 +24,20 @@ public class Boid : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        spawner = GetComponentInParent<Spawner>();
         nghbs = new List<Transform>();
-        velocity = new Vector2(Random.Range(1,10), Random.Range(1, 10));
+        velocity = new Vector2(Random.Range(1,10)/10, Random.Range(1, 10)/10);
     }
 
-    public void Initialise(float speed)
-    {
-
-    }
+  
 
     // Update is called once per frame
     void Update()
     {
         nghbs = GetNeighbors();
-        moveCloser(nghbs);
-        moveWidth(nghbs);
-        moveAway(nghbs, neighborRadius);
-
+        
+        velocity = moveComposite(moveCloser(nghbs),moveWidth(nghbs),moveAway(nghbs));
+        velocity *= spawner.driveFactor;
         int border = 100;
 
         if (transform.position.x > border && velocity.x < 0)
@@ -59,9 +58,6 @@ public class Boid : MonoBehaviour
             velocity.y = -velocity.y ;
         }
 
-
-
-
         move();
     }
 
@@ -76,103 +72,108 @@ public class Boid : MonoBehaviour
             if (c != GetComponent<Collider2D>())
             {
                 context.Add(c.transform);
-                if (c.gameObject.tag == "Obstacle")
-                {
-                    Debug.Log(c);
-                }
-                }
+            }
         }
         return context;
     }
 
-    public void moveCloser(List<Transform> boidsNeighbors)
+    public Vector2 moveCloser(List<Transform> boidsNeighbors)
     {
         if(boidsNeighbors.Count > 0)
         {
-            Vector2 avg = Vector2.zero;
+            Vector2 cohesionMove = Vector2.zero;
             
             foreach(Transform b in boidsNeighbors)
             {
                 if (b.gameObject.tag == "Boid")
                 {
-                    avg += (Vector2)(transform.position - b.position);
+                    cohesionMove += (Vector2)(b.position);
                 }
             }
-            avg /= boidsNeighbors.Count;
-            avg /= 100;
-            velocity -= avg *coefCohe;
-
+            cohesionMove /= boidsNeighbors.Count;
+            
+            cohesionMove -= (Vector2)this.transform.position *coefCohe;
+            return cohesionMove;
         }
+        return Vector2.zero;
     }
 
-    public void moveWidth(List<Transform> boidsNeighbors)
+    public Vector2 moveWidth(List<Transform> boidsNeighbors)
     {
-
         if (boidsNeighbors.Count > 0)
         {
-            Vector2 avg = Vector2.zero;
+            Vector2 alignementMove = Vector2.zero;
             foreach (Transform b in boidsNeighbors)
             {
                 if (b.gameObject.tag == "Boid")
                 {
-                    avg += (Vector2)(transform.position - b.position);
+                    alignementMove += (Vector2)(b.transform.up);
                 }
             }
-            avg /= boidsNeighbors.Count;
-            avg /= 40;
-            velocity += avg * coefAl;
-
+            alignementMove /= boidsNeighbors.Count;          
+            return alignementMove;
         }
-
-
+        return transform.up;
     }
 
-    public void moveAway(List<Transform> boidsNeighbors, float minDistance)
+    public Vector2 moveAway(List<Transform> boidsNeighbors)
     {
+        Vector2 avoidanceMove = Vector2.zero;
         if (boidsNeighbors.Count > 0)
         {
-            Vector2 distance = Vector2.zero;
+            
             int numClose = 0;
             foreach (Transform b in boidsNeighbors)
             {
-                Vector2 diff = (Vector2)(transform.position - b.position);
-                if(diff.magnitude <minDistance)
+                if(Vector2.SqrMagnitude(b.position - this.transform.position)< spawner.squareAvoidanceRadius)
                 {
                     numClose++;
-                    if(diff.x >= 0) { diff.x = Mathf.Sqrt(minDistance) - diff.x; }
-                    else if(diff.x < 0) { diff.x = -Mathf.Sqrt(minDistance) - diff.x; }
-
-                    if (diff.y >= 0) { diff.y = Mathf.Sqrt(minDistance) - diff.y; }
-                    else if (diff.y < 0) { diff.y = -Mathf.Sqrt(minDistance) - diff.y; }
-
-                    int scale = 1;
-                    if (b.gameObject.tag == "Obstacle")
-                    {
-                        Debug.Log(b);
-                        scale = 10;
-                    }
-                    distance += diff * scale *coefEl;
+                    avoidanceMove +=(Vector2)(this.transform.position - b.position);
                 }
+                
             }
 
+            if(numClose>0)
+            {
+                avoidanceMove /= numClose;
+            }
             
-            distance /= 5;
-            velocity -= distance;
-            
-
         }
+        return avoidanceMove;
     }
 
+    public Vector2 moveComposite(Vector2 cohesion, Vector2 alignement, Vector2 eloignement)
+    {
+        Vector2 move = Vector2.zero;
+
+        if (cohesion.sqrMagnitude > (coefCohe * coefCohe))
+        {
+            cohesion.Normalize();
+            cohesion *= coefCohe;
+        }
+        move += cohesion;
+
+        if (alignement.sqrMagnitude > (coefAl * coefAl))
+        {
+            alignement.Normalize();
+            alignement *= coefAl;
+        }
+        move += alignement;
+
+        if (eloignement.sqrMagnitude > (coefEl * coefEl))
+        {
+            eloignement.Normalize();
+            eloignement *= coefEl;
+        }
+        move += eloignement;
+
+        return move;
+    }
 
     public void move()
     {
-        if(Mathf.Abs(velocity.x) > maxVelocity || Mathf.Abs(velocity.x) > maxVelocity)
-        {
-            float scaleFactor = maxVelocity / Mathf.Max(Mathf.Abs(velocity.x), Mathf.Abs(velocity.y));
-            velocity *= scaleFactor;
-        }
             
-        transform.position -= ((Vector3)velocity  *speed* Time.deltaTime);
+        transform.position += ((Vector3)velocity* Time.deltaTime);
         transform.up = (Vector3)velocity;
         /*Vector3 newDirection = Vector3.RotateTowards(transform.forward, (Vector3)velocity, 0.0f, 0.0f);
         transform.rotation = Quaternion.LookRotation(newDirection);*/

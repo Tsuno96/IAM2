@@ -112,8 +112,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bfd7a3cb2840e64f9d12ab170d345da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 2
-  neighborRadius: 5
+  speed: 1
+  neighborRadius: 20
   nghbs: []
   velocity: {x: 0, y: 0}
   coefCohe: 1

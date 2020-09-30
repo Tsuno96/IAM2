@@ -5,22 +5,32 @@ using UnityEngine;
 public class Spawner : MonoBehaviour
 {
     public Boid Boid;
-    List<Boid> lst_Boids = new List<Boid>();
+    public List<Boid> lst_Boids = new List<Boid>();
     public float f_Density;
 
     [Range(10, 500)]
     public int nbBoids = 100;
     [Range(0, 20)]
-    public float cohesion = 1;
+    public int cohesion = 1;
     [Range(0, 20)]
-    public float alignement = 1;
+    public int alignement = 1;
     [Range(0, 20)]
-    public float eloignement = 1;
+    public int eloignement = 1;
+    [Range(0f, 1f)]
+    public float avoidanceRadiusMultiplier = 0.5f;
+
+    [Range(1f, 100f)]
+    public float driveFactor = 10f;
+    float squareMaxSpeed;
+    float squareNeighborRadius;
+    public float squareAvoidanceRadius;
+    
+
 
     // Start is called before the first frame update
     void Start()
     {
-
+        squareAvoidanceRadius = squareNeighborRadius * avoidanceRadiusMultiplier * avoidanceRadiusMultiplier;
         for (int i = 0; i < nbBoids; i++)
         {
             Vector3 pos = Random.insideUnitSphere * nbBoids * f_Density;
