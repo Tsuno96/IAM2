@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using JetBrains.Annotations;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.ComTypes;
 using UnityEngine;
@@ -7,17 +8,14 @@ using UnityEngine;
 public class Boid : MonoBehaviour
 {
     public float speed = 1;
-    public float neighborRadius;
+   
     public List<Transform> nghbs;
 
     public Vector2 velocity;
     
     Spawner spawner;
 
-    public float coefCohe = 1;
-    public float coefAl = 1;
 
-    public float coefEl = 1;
 
     float maxVelocity = 10;
 
@@ -25,6 +23,7 @@ public class Boid : MonoBehaviour
     void Start()
     {
         spawner = GetComponentInParent<Spawner>();
+        //Debug.Log(spawner);
         nghbs = new List<Transform>();
         velocity = new Vector2(Random.Range(1,10)/10, Random.Range(1, 10)/10);
     }
@@ -32,13 +31,18 @@ public class Boid : MonoBehaviour
   
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         nghbs = GetNeighbors();
         
-        velocity = moveComposite(moveCloser(nghbs),moveWidth(nghbs),moveAway(nghbs));
+        velocity = moveComposite(moveCloserSmooth(nghbs),moveWidth(nghbs),moveAway(nghbs));
         velocity *= spawner.driveFactor;
-        int border = 100;
+
+        if (velocity.sqrMagnitude > spawner.squareMaxSpeed)
+        {
+            velocity = velocity.normalized * spawner.maxSpeed;
+        }
+        /*int border = 100;
 
         if (transform.position.x > border && velocity.x < 0)
         {
@@ -56,7 +60,7 @@ public class Boid : MonoBehaviour
         if (transform.position.y < -border && velocity.y > 0)
         {
             velocity.y = -velocity.y ;
-        }
+        }*/
 
         move();
     }
@@ -65,7 +69,7 @@ public class Boid : MonoBehaviour
     List<Transform> GetNeighbors()
     {
         List<Transform> context = new List<Transform>();
-        Collider2D[] contextColliders = Physics2D.OverlapCircleAll(this.transform.position, neighborRadius);
+        Collider2D[] contextColliders = Physics2D.OverlapCircleAll(this.transform.position, spawner.neighborRadius);
         
         foreach (Collider2D c in contextColliders)
         {
@@ -92,7 +96,32 @@ public class Boid : MonoBehaviour
             }
             cohesionMove /= boidsNeighbors.Count;
             
-            cohesionMove -= (Vector2)this.transform.position *coefCohe;
+            cohesionMove -= (Vector2)this.transform.position;
+            return cohesionMove;
+        }
+        return Vector2.zero;
+    }
+
+    public Vector2 moveCloserSmooth(List<Transform> boidsNeighbors)
+    {
+        Vector2 currentVelocity;
+        float agentSmoothTime = 0.5f;
+
+        if (boidsNeighbors.Count > 0)
+        {
+            Vector2 cohesionMove = Vector2.zero;
+
+            foreach (Transform b in boidsNeighbors)
+            {
+                if (b.gameObject.tag == "Boid")
+                {
+                    cohesionMove += (Vector2)(b.position);
+                }
+            }
+            cohesionMove /= boidsNeighbors.Count;
+
+            cohesionMove -= (Vector2)this.transform.position;
+            cohesionMove = Vector2.SmoothDamp(transform.up, cohesionMove, ref velocity, agentSmoothTime);
             return cohesionMove;
         }
         return Vector2.zero;
@@ -125,7 +154,7 @@ public class Boid : MonoBehaviour
             int numClose = 0;
             foreach (Transform b in boidsNeighbors)
             {
-                if(Vector2.SqrMagnitude(b.position - this.transform.position)< spawner.squareAvoidanceRadius)
+                if (Vector2.SqrMagnitude(b.position - this.transform.position)< spawner.squareAvoidanceRadius)
                 {
                     numClose++;
                     avoidanceMove +=(Vector2)(this.transform.position - b.position);
@@ -145,25 +174,25 @@ public class Boid : MonoBehaviour
     public Vector2 moveComposite(Vector2 cohesion, Vector2 alignement, Vector2 eloignement)
     {
         Vector2 move = Vector2.zero;
-
-        if (cohesion.sqrMagnitude > (coefCohe * coefCohe))
+        cohesion *= spawner.cohesion;
+        if (cohesion.sqrMagnitude > (spawner.cohesion * spawner.cohesion))
         {
             cohesion.Normalize();
-            cohesion *= coefCohe;
+            cohesion *= spawner.cohesion;
         }
         move += cohesion;
-
-        if (alignement.sqrMagnitude > (coefAl * coefAl))
+        alignement *= spawner.alignement;
+        if (alignement.sqrMagnitude > (spawner.alignement * spawner.alignement))
         {
             alignement.Normalize();
-            alignement *= coefAl;
+            alignement *= spawner.alignement;
         }
         move += alignement;
-
-        if (eloignement.sqrMagnitude > (coefEl * coefEl))
+        eloignement *= spawner.eloignement;
+        if (eloignement.sqrMagnitude > (spawner.eloignement * spawner.eloignement))
         {
             eloignement.Normalize();
-            eloignement *= coefEl;
+            eloignement *= spawner.eloignement;
         }
         move += eloignement;
 
@@ -173,8 +202,8 @@ public class Boid : MonoBehaviour
     public void move()
     {
             
-        transform.position += ((Vector3)velocity* Time.deltaTime);
         transform.up = (Vector3)velocity;
+        transform.position += ((Vector3)velocity* Time.deltaTime);
         /*Vector3 newDirection = Vector3.RotateTowards(transform.forward, (Vector3)velocity, 0.0f, 0.0f);
         transform.rotation = Quaternion.LookRotation(newDirection);*/
 

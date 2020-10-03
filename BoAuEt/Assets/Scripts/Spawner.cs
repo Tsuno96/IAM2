@@ -18,11 +18,14 @@ public class Spawner : MonoBehaviour
     public int eloignement = 1;
     [Range(0f, 1f)]
     public float avoidanceRadiusMultiplier = 0.5f;
+    [Range(1f, 100f)]
+    public float maxSpeed = 5f;
 
     [Range(1f, 100f)]
     public float driveFactor = 10f;
-    float squareMaxSpeed;
-    float squareNeighborRadius;
+    public float neighborRadius;
+    public float squareMaxSpeed;
+    public float squareNeighborRadius;
     public float squareAvoidanceRadius;
     
 
@@ -30,6 +33,8 @@ public class Spawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        squareMaxSpeed = maxSpeed * maxSpeed;
+        squareNeighborRadius = neighborRadius * neighborRadius;
         squareAvoidanceRadius = squareNeighborRadius * avoidanceRadiusMultiplier * avoidanceRadiusMultiplier;
         for (int i = 0; i < nbBoids; i++)
         {
@@ -46,11 +51,6 @@ public class Spawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-       foreach(Boid b in lst_Boids)
-       {
-           b.coefCohe = cohesion;
-           b.coefEl = eloignement;
-           b.coefAl = alignement;
-       } 
+
     }
 }

@@ -548,12 +548,16 @@ MonoBehaviour:
   Boid: {fileID: 2918574908934172848, guid: b22e7e64b90d89b4aaa5d0e479b76ef4, type: 3}
   lst_Boids: []
   f_Density: 0.5
-  nbBoids: 157
+  nbBoids: 78
   cohesion: 1
   alignement: 1
-  eloignement: 4
-  avoidanceRadiusMultiplier: 0.5
+  eloignement: 1
+  avoidanceRadiusMultiplier: 1
+  maxSpeed: 5
   driveFactor: 10
+  neighborRadius: 2
+  squareMaxSpeed: 0
+  squareNeighborRadius: 0
   squareAvoidanceRadius: 0
 --- !u!4 &1273029891
 Transform:
