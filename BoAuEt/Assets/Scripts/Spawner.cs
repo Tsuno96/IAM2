@@ -28,6 +28,9 @@ public class Spawner : MonoBehaviour
     public float squareNeighborRadius;
     public float squareAvoidanceRadius;
     
+    public Transform chevre;
+    [Range(0, 5)]
+    public float coefChevre = 1;
 
 
     // Start is called before the first frame update

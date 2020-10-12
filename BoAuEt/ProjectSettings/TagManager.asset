@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Obstacle
   - Boid
+  - Chevre
   layers:
   - Default
   - TransparentFX

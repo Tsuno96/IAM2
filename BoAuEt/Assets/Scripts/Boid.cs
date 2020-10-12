@@ -7,13 +7,16 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public class Boid : MonoBehaviour
 {
-    public float speed = 1;
-   
+
     public List<Transform> nghbs;
 
     public Vector2 velocity;
     
     Spawner spawner;
+
+    public int state = 0;
+
+    
 
 
 
@@ -31,36 +34,40 @@ public class Boid : MonoBehaviour
   
 
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
         nghbs = GetNeighbors();
         
-        velocity = moveComposite(moveCloserSmooth(nghbs),moveWidth(nghbs),moveAway(nghbs));
+        velocity = moveComposite(moveCloserSmooth(nghbs),moveWidth(nghbs),moveAway(nghbs), moveToChevre(nghbs));
+        
         velocity *= spawner.driveFactor;
 
         if (velocity.sqrMagnitude > spawner.squareMaxSpeed)
         {
             velocity = velocity.normalized * spawner.maxSpeed;
         }
-        /*int border = 100;
+        int borderX = 119;
+        
 
-        if (transform.position.x > border && velocity.x < 0)
+        if (transform.position.x > borderX && velocity.x > 0)
         {
+            
             velocity.x = -velocity.x;
         }
-        if (transform.position.x < -border && velocity.x > 0)
-        {
+        if (transform.position.x < -borderX && velocity.x < 0)
+        {           
             velocity.x = -velocity.x ;
         }
 
-        if (transform.position.y > border && velocity.y < 0)
-        {
+        if (transform.position.y > 92 && velocity.y > 0)
+        {           
             velocity.y = -velocity.y ;
         }
-        if (transform.position.y < -border && velocity.y > 0)
+        if (transform.position.y < -43 && velocity.y < 0)
         {
+           
             velocity.y = -velocity.y ;
-        }*/
+        }
 
         move();
     }
@@ -81,7 +88,8 @@ public class Boid : MonoBehaviour
         return context;
     }
 
-    public Vector2 moveCloser(List<Transform> boidsNeighbors)
+//old Cohesion
+    /*public Vector2 moveCloser(List<Transform> boidsNeighbors)
     {
         if(boidsNeighbors.Count > 0)
         {
@@ -93,6 +101,7 @@ public class Boid : MonoBehaviour
                 {
                     cohesionMove += (Vector2)(b.position);
                 }
+                
             }
             cohesionMove /= boidsNeighbors.Count;
             
@@ -100,11 +109,36 @@ public class Boid : MonoBehaviour
             return cohesionMove;
         }
         return Vector2.zero;
+    }*/
+
+    public Vector2 moveToChevre(List<Transform> boidsNeighbors)
+    {
+        if (boidsNeighbors.Count > 0)
+        {
+            Vector2 chevreMove = Vector2.zero;
+            foreach (Transform b in boidsNeighbors)
+            {
+                if(b.gameObject.tag == "Chevre")
+                {
+                    
+                    switch(b.GetComponent<Target>().state)
+                    {
+                        case 1 : chevreMove += (Vector2)spawner.chevre.position - (Vector2)transform.position;
+                        break;
+                        case 2 : chevreMove -= (Vector2)spawner.chevre.position - (Vector2)transform.position;
+                        break;
+                    }
+                
+                }
+            }
+
+            return chevreMove;
+        }
+        return Vector2.zero;
     }
 
     public Vector2 moveCloserSmooth(List<Transform> boidsNeighbors)
     {
-        Vector2 currentVelocity;
         float agentSmoothTime = 0.5f;
 
         if (boidsNeighbors.Count > 0)
@@ -127,6 +161,9 @@ public class Boid : MonoBehaviour
         return Vector2.zero;
     }
 
+
+    
+
     public Vector2 moveWidth(List<Transform> boidsNeighbors)
     {
         if (boidsNeighbors.Count > 0)
@@ -137,7 +174,7 @@ public class Boid : MonoBehaviour
                 if (b.gameObject.tag == "Boid")
                 {
                     alignementMove += (Vector2)(b.transform.up);
-                }
+                }        
             }
             alignementMove /= boidsNeighbors.Count;          
             return alignementMove;
@@ -157,7 +194,15 @@ public class Boid : MonoBehaviour
                 if (Vector2.SqrMagnitude(b.position - this.transform.position)< spawner.squareAvoidanceRadius)
                 {
                     numClose++;
-                    avoidanceMove +=(Vector2)(this.transform.position - b.position);
+                    if(b.gameObject.tag == "Obstacle")
+                    {
+                        avoidanceMove +=(Vector2)(this.transform.position - b.position) *5;
+                    }
+                    else if(b.gameObject.tag != "Chevre")
+                    {
+                        avoidanceMove +=(Vector2)(this.transform.position - b.position);           
+                    }
+                   
                 }
                 
             }
@@ -171,7 +216,7 @@ public class Boid : MonoBehaviour
         return avoidanceMove;
     }
 
-    public Vector2 moveComposite(Vector2 cohesion, Vector2 alignement, Vector2 eloignement)
+    public Vector2 moveComposite(Vector2 cohesion, Vector2 alignement, Vector2 eloignement, Vector2 chevre)
     {
         Vector2 move = Vector2.zero;
         cohesion *= spawner.cohesion;
@@ -181,6 +226,7 @@ public class Boid : MonoBehaviour
             cohesion *= spawner.cohesion;
         }
         move += cohesion;
+
         alignement *= spawner.alignement;
         if (alignement.sqrMagnitude > (spawner.alignement * spawner.alignement))
         {
@@ -188,6 +234,7 @@ public class Boid : MonoBehaviour
             alignement *= spawner.alignement;
         }
         move += alignement;
+
         eloignement *= spawner.eloignement;
         if (eloignement.sqrMagnitude > (spawner.eloignement * spawner.eloignement))
         {
@@ -195,6 +242,14 @@ public class Boid : MonoBehaviour
             eloignement *= spawner.eloignement;
         }
         move += eloignement;
+
+        chevre *= spawner.coefChevre;
+        if(chevre.sqrMagnitude > spawner.coefChevre * spawner.coefChevre)
+        {
+            chevre.Normalize();
+            chevre *= spawner.coefChevre;
+        }
+        move +=chevre;
 
         return move;
     }
